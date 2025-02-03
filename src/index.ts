@@ -19,16 +19,16 @@ app.set("views", path.resolve(__dirname, "./views"));
 app.use(Routes);
 
 app.get("/", async (req: Request, res: Response) => {
-   const html = await ejs.renderFile(
-      path.resolve(__dirname, "./views/emails/welcome.ejs"),
-      { name: "John Doe" }
-   );
+   // const html = await ejs.renderFile(
+   //    path.resolve(__dirname, "./views/emails/welcome.ejs"),
+   //    { name: "John Doe" }
+   // );
    // sendEmail("sofev67022@eluxeer.com", "Testing SMTP", html);
-   await emailQueue.add(emailQueueName, {
-      to: "sofev67022@eluxeer.com",
-      subject: "Welcome",
-      body: html,
-   });
+   // await emailQueue.add(emailQueueName, {
+   //    to: "sofev67022@eluxeer.com",
+   //    subject: "Welcome",
+   //    body: html,
+   // });
    res.json({ message: "Email sent" });
 });
 

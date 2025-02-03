@@ -12,6 +12,7 @@ import bcrypt from "bcrypt";
 import { v4 as uuid } from "uuid";
 import { emailQueue, emailQueueName } from "../jobs/EmailJob.js";
 import jwt from "jsonwebtoken";
+import authMiddleware from "../middlewares/AuthMiddlewares.js";
 
 const router = Router();
 
@@ -129,6 +130,26 @@ router.post("/register", async (req: Request, res: Response) => {
       } else {
          res.status(500).json({ message: "Something went wrong" });
       }
+   }
+});
+
+// * Get user route
+
+router.get("/user", authMiddleware, async (req: Request, res: Response) => {
+   try {
+      const user = await prisma.user.findUnique({
+         where: { id: req.user?.id },
+      });
+
+      if (!user) {
+         res.status(404).json({ message: "User not found" });
+         return;
+      }
+
+      res.json({ user });
+   } catch (error) {
+      console.log(error);
+      res.status(500).json({ message: "Something went wrong" });
    }
 });
 

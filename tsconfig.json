@@ -8,7 +8,8 @@
       "moduleResolution": "Node16",
       "esModuleInterop": true,
       "types": ["node"],
-      "strict": true
+      "strict": true,
+      "typeRoots": ["./node_modules/@types", "./src/types"]
    },
    "include": ["src"]
 }

@@ -13,10 +13,11 @@ import { v4 as uuid } from "uuid";
 import { emailQueue, emailQueueName } from "../jobs/EmailJob.js";
 import jwt from "jsonwebtoken";
 import authMiddleware from "../middlewares/AuthMiddlewares.js";
+import { authLimiter } from "../config/rateLimit.js";
 
 const router = Router();
 
-router.post("/login", async (req: Request, res: Response) => {
+router.post("/login", authLimiter, async (req: Request, res: Response) => {
    try {
       const body = req.body;
 
@@ -73,7 +74,7 @@ router.post("/login", async (req: Request, res: Response) => {
 });
 
 // * Register a new user
-router.post("/register", async (req: Request, res: Response) => {
+router.post("/register", authLimiter, async (req: Request, res: Response) => {
    try {
       const body = req.body;
       const payload = registerSchema.parse(body);
@@ -140,5 +141,52 @@ router.get("/user", authMiddleware, async (req: Request, res: Response) => {
    res.json({ user });
    return;
 });
+
+router.post(
+   "/check/credentials",
+   authLimiter,
+   async (req: Request, res: Response) => {
+      try {
+         const body = req.body;
+
+         const payload = loginSchema.parse(body);
+         console.log(payload);
+         let user = await prisma.user.findUnique({
+            where: {
+               email: payload.email,
+            },
+         });
+         if (!user || user === null) {
+            res.status(422).json({
+               errors: { email: "No user found with this email" },
+            });
+            return;
+         }
+
+         const compare = await bcrypt.compare(payload.password, user.password);
+         if (!compare) {
+            res.status(422).json({
+               errors: { password: "Invalid Credentials" },
+            });
+            return;
+         }
+         // JWT Payload
+
+         res.json({
+            message: "Details are correct!!",
+         });
+         return;
+      } catch (error) {
+         console.log(error);
+         if (error instanceof ZodError) {
+            const errors = formatError(error);
+            res.status(422).json({ message: "Invalid Data", errors });
+            return;
+         } else {
+            res.status(500).json({ message: "Something went wrong" });
+         }
+      }
+   }
+);
 
 export default router;

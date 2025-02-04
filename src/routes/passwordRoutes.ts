@@ -49,7 +49,7 @@ router.post("/forget-password", authLimiter, async (req, res) => {
          },
       });
 
-      const url = `${process.env.CLIENT_URL}/reset-password?email=${payload.email}&token=${token}`;
+      const url = `${process.env.CLIENT_APP_URL}/reset-password?email=${payload.email}&token=${token}`;
 
       const html = await renderEmailEjs("forget-password.ejs", {
          name: user.name,
@@ -100,6 +100,7 @@ router.post("/reset-password", authLimiter, async (req, res) => {
       // check if token is valid
       if (user.password_reset_token !== payload.token) {
          res.status(422).json({
+            message: "Expired link",
             errors: { token: "Invalid token" },
          });
          return;

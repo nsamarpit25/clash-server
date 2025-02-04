@@ -51,7 +51,7 @@ router.post("/forget-password", authLimiter, async (req, res) => {
 
       const url = `${process.env.CLIENT_URL}/reset-password?email=${payload.email}&token=${token}`;
 
-      const html = renderEmailEjs("forget-password.ejs", {
+      const html = await renderEmailEjs("forget-password.ejs", {
          name: user.name,
          url,
       });

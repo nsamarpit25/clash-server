@@ -4,6 +4,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import ejs from "ejs";
 import Routes from "./routes/index.js";
+import fileUpload from "express-fileupload";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app: Application = express();
@@ -12,6 +13,14 @@ const PORT = process.env.PORT || 7000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(appLimiter);
+
+app.use(
+   fileUpload({
+      useTempFiles: true,
+      tempFileDir: "/tmp/",
+   })
+);
+app.use(express.static("public"));
 
 // set view engine
 app.set("view engine", "ejs");
